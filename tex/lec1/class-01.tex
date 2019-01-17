@@ -1,0 +1,181 @@
+\input{preamble_scribe.tex}
+
+\begin{document}
+
+\course{IFT 6132 -- } 		
+\coursetitle{Advanced Structured Prediction}	
+\semester{Winter 2019}		
+\lecturer{Simon Lacoste-Julien}	
+\scribe{Frederic Boileau}		
+\lecturenumber{1}		
+\lecturedate{January 8, Universit\'e de Montr\'eal}	
+\maketitle
+
+\section{Structured Prediction Basis and Setup}
+Given a training dataset
+\begin{equation}
+    D \eqbydef (\xi, \yi)_{i=1}^n \qquad \xi \in \X \quad \yi \in \Y \quad i=1,\ldots,n
+\end{equation}
+we want to learn a \emph{prediction mapping} 
+$h_\omega \, : \, \X \rightarrow \Y$ where $\omega$ is a parameter for the
+mapping.\\
+Moreover we want that mapping to have \emph{low generalization error}:
+\begin{equation}
+    L(\omega;P) \eqbydef \E_{(x,y) \sim P} [ l(y, h_\omega \given x)]
+    \label{eq:vrisk}
+\end{equation}
+In the above equation $L$ is the generalization error\footnote{also known as the
+Vapnik risk in ML literature} which takes as input the parameter 
+of the prediction mapping and $P$ which is an (arbitrary?) `test distribution'.
+The function $l(\cdot,\cdot)$ on the RHS is the \emph{structured error
+function} which evaluates how bad the different mistakes are.\\
+
+\noindent\textbf{Note:} See lectures 4 and 5 of IFT6269 (Probabilistic
+Graphical Models) for a review of statistical decision theory%
+\footnote{\url{http://www.iro.umontreal.ca/~slacoste/teaching/ift6269/A18/}}\\
+
+\noindent Two aspects characterize structured prediction in contrast to traditional
+classification:
+\begin{enumerate}
+\item the set of labels $\Y$ is usually \textbf{exponential in size}.
+\item We need an \textbf{encoding function} to
+    represent the labels $y=(y_1,\ldots,y_d)$. The ``pieces'' of $y$ have
+    constraints.
+\item The prediction task is characterized by a \textbf{structured error/loss
+    function} $\ell(y,y')$. In other words we do not automatically get
+    an obvious metric for the loss (such as mean squared error in simple
+    linear regression).
+\end{enumerate}
+
+
+We need an error function on complex labels because not all mistakes are equal.
+For instance in machine translation making a mistake on a single word is not as
+bad as getting the whole sentence wrong. In the case of scene labelling it is a
+much smaller mistake to label a car as a truck than say, a pedestrian as the
+road. Note that error functions do not necessarily have to be \emph{metrics}
+as rigorously defined in analysis.
+
+\section{Empirical Risk Minimization}
+As stated above our goal is to minimize the generalization error, aka the
+Vapnik risk as defined in \eqref{eq:vrisk}. However in general we do not have
+access to the distribution over which the expctation is taken so that we
+need to approximate it. We thus define the empirical risk minimization
+which is just the average of the loss function over the training set.
+\begin{equation}
+    \hat L(\omega) \eqbydef \frac{1}{n}\sum_{i=1}^n l(\yi,h_{\omega}(\xi))
+    + R(\omega) \label{eq:erm}
+\end{equation} 
+
+The term $R(\omega)$ is a regularizer for the parameter in the above (e.g.
+$\vert \vert \cdot \vert \vert ^2$). While we have the information necessary to
+compute the above it is rarely easy to miminize; the structured loss functions
+(in the summation above) which naturally arise are not convex and/or continuous
+in general. While there are techniques to deal with non continuous objective
+functions the absence of convexity is a major problem in optimization. 
+
+The solution is to replace the loss function by a \emph{surrogate loss
+function} (or a contrast function in the statistics literature).  While there
+are many design consideration for such a surrogate loss function the most
+commonly required feature is convexity. Examples for such functions
+are the structured hinge loss and the log-loss. Yann LeCun 
+presents and discusses many of these functions in his paper on energy based
+models\footnote{\url{http://yann.lecun.com/exdb/publis/pdf/lecun-06.pdf}}.\\
+
+Substituting those new loss functions into the expression for ERM we 
+get the objective function of our optimization problem:
+\begin{equation}
+    \hat{\mathcal L}(\omega) \eqbydef \frac{1}{n}\sum_{i=1}^n
+    \mathcal L (\xi,\yi,\omega)
+    + R(\omega) \label{eq:surrogate}
+\end{equation}
+
+\newpage
+%The following is copy pasted from 2017 partially latexed scribes by
+%Gabriel Huang
+\section{Generative vs. Discriminative models.}
+
+Prediction consists in learning a mapping $h_w: \X \longrightarrow \Y$. This
+can be done at different levels of modelling and robustness. There is a
+tradeoff: a generative model is more powerful --since it explains the data more
+completely-- but it is less robust, whereas a simpler, discriminative model
+explains less but is more robust.
+
+Types of model from least to most discriminative:
+\begin{itemize}
+\item \textbf{joint-probability $p_w(x,y)$} -- generative model of distribution
+    of $x$ and $y$ jointly. The fit to data is the likelihood, and learning is
+    done by finding the parameters $w$ maximizing the likelihood (ML). One way
+    to make predictions to take $h(x) = \argmax_y p_w(y|x)= \argmax_y
+    p_w(x,y)$.  \item \textbf{conditional probability $p_w(y|x)$} --
+    conditional generative
+    model of the distribution of $y$ once $x$ is fixed. The fit to data is the
+    conditional-likelihood, and learning is done by finding the parameters $w$
+    maximizing the conditional-likelihood (MCL). One way to make predictions to
+    take $h(x) = \argmax_y p_w(y|x)$.  \item \textbf{prediction mapping
+    $y=h_w(x)$} -- discriminative model: instead of a model of $x$ or $y$,
+    directly learn a mapping from $x$ to a good label $y$.  The model is
+    learned by surrogate loss minimization, which uses information from an
+    \textbf{loss function} or \textbf{error function} $l(y,y')$, which in turn
+    defines the learning task. 
+\end{itemize}
+
+The terminology ``structured prediction" traditionally focuses on prediction
+mappings (vs.\ generative modelling), and will be the approach we take in this
+course. Loosely speaking, because pointwise estimators are more discriminative,
+they are simpler which gives them more power to model more complex labels $y$.
+Even though the learned prediction function is not the correct one, we can
+still try to find the best one -- in terms of classification error -- among a
+class of functions.
+
+
+\newpage
+\section{Examples of structured prediction problems}
+
+\begin{example}[optical character recognition]
+from an input image $x$ representing a word or sentence, predict the vector $y$
+of corresponding letters where each dimension corresponds to successive
+letters.  \end{example}
+
+\begin{example}[word alignment]
+Align sentences in two languages.
+\par
+  \centering
+    \includegraphics[width=0.8\textwidth]{img/wordalign}
+\end{example}
+
+\begin{example}[machine translation]
+translate a sentence from one language to the other.
+  \centering
+    \includegraphics[width=0.8\textwidth]{img/googletranslate}
+Google translate interface.
+
+\end{example}
+
+\begin{example}[3D object recognition]
+from a depth map $x$ predict an object map $y$ which maps each pixel location
+to an object class.
+  \centering
+    \includegraphics[width=0.5\textwidth]{img/3d}
+Image courtesy of Ben Taskar.
+\end{example}
+
+\begin{example}[protein folding]
+from a sequence of amino-acids $x$ predict the 3D structure $y$ of the
+corresponding protein.
+  \centering
+    \includegraphics[width=0.7\textwidth]{img/proteinfolding}
+Image courtesy of Ben Taskar.
+\end{example}
+
+\begin{example}[text parsing]
+from a sentence of words $x$ predict the parse tree(s) $y$ that generated~$x$.
+  \centering
+    \includegraphics[width=0.5\textwidth]{img/parsetree}
+Image courtesy of Ron
+Daniel%
+\footnote{https://www.elsevier.com/connect/new-open-access-resource-will-support-text-mining-and-natural-language-processing}.
+\end{example}
+
+
+
+\end{document}
