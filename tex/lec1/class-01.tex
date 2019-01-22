@@ -26,16 +26,18 @@ and the output is the set of matching pairs of words. We can add a matching
 constraint such as setting a maximum of one alignment per word. 
 \begin{center}
 \includegraphics[scale=0.6]{img/lecture_1_word_alignment.png}
+
 Example of word alignments
 \end{center}
-
 In this example, if we name $e = e_1, ..., e_E$ the english sentence and $f =
 f_1, ..., f_F$ the french one and encode the alignments as $y_{ij} =
 \mathbbm{1}(e_i \; linked \; to \; f_j) \in \{0,1\}$ with $(i,j) \in E \times
 F$, then we have $|\mathcal{Y}| = 2^{E\times F}$. Adding the constraint
 ($\sum_i y_{ij} \leq 1$ and $\sum_j y_{ij} \leq 1$) restrains the size of the
 output space to $|\mathcal{Y}| = \sum_{k=0}^{\min(E,F)} \begin{pmatrix}
-    \min(E,F) \\ k \end{pmatrix} \begin{pmatrix} \max(E,F) \\ k \end{pmatrix}$.  \\ \\
+\min(E,F) \\ k \end{pmatrix} \begin{pmatrix} \max(E,F) \\ k \end{pmatrix}$.
+\\
+\\
 More examples of structured prediction problems can be found in Appendix A.
 \end{example}
 
