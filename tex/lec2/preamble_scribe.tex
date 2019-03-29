@@ -1,0 +1,60 @@
+\documentclass[12pt]{report}	
+\usepackage{scribe_MG}
+
+%\documentclass[12pt,a4paper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{scribe_MG}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[]{algorithm2e}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{bbm}
+\usepackage{appendix}
+
+
+% Style
+%\theoremstyle{definition}
+\newtheorem{example}{Example}[section]
+%\newenvironment{example}[1]{\par \noindent\textbf{Example: #1}\\text more text}{}
+
+% Formatting
+\oddsidemargin .00in
+\evensidemargin .00in
+\marginparwidth 0.07 true in
+\addtolength{\headsep}{0.1in}
+\addtolength{\voffset}{0.6in}
+\textheight 8.5 true in
+\textwidth 6.5 true in
+\clubpenalty=10000
+
+% ----------------------------------------------------------------------
+%  Standard lemma, theorem, and corollary environments.
+% ----------------------------------------------------------------------
+
+% text abbrevs
+
+%\newcommand{\etc}{{\it etc.}}
+
+% std math stuff
+
+
+
+% Shortcuts
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\let\ksi\xi
+\renewcommand{\xi}{x^{(i)}}
+\newcommand{\yi}{y^{(i)}}
+\newcommand{\xit}{x^{(i_t)}}
+\newcommand{\yit}{y^{(i_t)}}
+\newcommand{\argmax}{\arg\!\max}
+
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand\given[1][]{\:#1\vert\:}
+%\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+%\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
